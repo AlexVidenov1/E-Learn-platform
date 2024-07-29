@@ -42,10 +42,25 @@ class Student(models.Model):
     def __str__(self):
         return f'Student: {self.user.email}'
 class Course(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
     description = models.TextField()
-    is_public = models.BooleanField(default=True)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    objectives = models.TextField(null=True, blank=True)
+    owner = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    tags = models.CharField(max_length=200, default='')
+    page_picture = models.ImageField(upload_to='images/', default='images/default.jpg')
+    is_public = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False)
+    subscriptions = models.ManyToManyField(Student, blank=True, related_name='subscribed_courses')
+    rating = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return self.title
+
+class Section(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    description = models.TextField(blank=True, null=True)
+    information = models.TextField(blank=True, null=True) # could be links, references, etc.
 
     def __str__(self):
         return self.title
