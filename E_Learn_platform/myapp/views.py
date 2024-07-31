@@ -1,6 +1,7 @@
 
-from django.contrib.auth import login, authenticate
-from .forms import RegisterForm
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
+from .forms import LoginForm, RegisterForm
 from django.shortcuts import render, redirect
 from .models import Student, Teacher
 
@@ -41,3 +42,24 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                print(f"Logging in user: {user}")
+                login(request, user)
+                return redirect('home')
+            else:
+                # Add an error message if authentication fails
+                form.add_error(None, 'Invalid username or password')
+        else:
+            print("Form is not valid")
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
