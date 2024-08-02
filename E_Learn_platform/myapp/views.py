@@ -68,11 +68,15 @@ def logout_view(request):
 @login_required
 def student_courses_view(request):
     user = request.user
-    try:
-        student = user.student
-        subscribed_courses = student.subscribed_courses.all()
-    except Student.DoesNotExist:
-        return redirect('home')
+    print(f"User: {user.username}, Is student: {hasattr(user, 'student')}")
+    
+    if not hasattr(user, 'student'):
+        print("User is not a student, displaying not_a_student page.")
+        return render(request, 'not_a_student.html')
+    
+    student = user.student
+    subscribed_courses = student.subscribed_courses.all()
+    
     context = {
         'courses': subscribed_courses
     }
