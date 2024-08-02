@@ -3,8 +3,9 @@ from django.contrib.auth import login, logout
 from django.contrib.auth import authenticate
 from .forms import LoginForm, RegisterForm
 from django.shortcuts import render, redirect
-from .models import Student, Teacher
+from .models import Course, Student, Teacher
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     return render(request, 'home.html')
@@ -62,3 +63,17 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+
+@login_required
+def student_courses_view(request):
+    user = request.user
+    try:
+        student = user.student
+        subscribed_courses = student.subscribed_courses.all()
+    except Student.DoesNotExist:
+        return redirect('home')
+    context = {
+        'courses': subscribed_courses
+    }
+    return render(request, 'student_courses.html', context)

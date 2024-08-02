@@ -38,19 +38,21 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     enrollment_number = models.CharField(max_length=20, unique=True, default='0000000000')
     course = models.CharField(max_length=100, default='B.Tech')
+    subscribed_courses = models.ManyToManyField('Course', related_name='students_subscribed')
 
     def __str__(self):
         return f'Student: {self.user.email}'
+
 class Course(models.Model):
     title = models.CharField(max_length=200, unique=True)
     description = models.TextField()
     objectives = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    owner = models.ForeignKey('Teacher', on_delete=models.CASCADE)
     tags = models.CharField(max_length=200, default='')
     page_picture = models.ImageField(upload_to='images/', default='images/default.jpg')
     is_public = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
-    subscriptions = models.ManyToManyField(Student, blank=True, related_name='subscribed_courses')
+    subscriptions = models.ManyToManyField(Student, blank=True, related_name='courses_subscribed')
     rating = models.FloatField(default=0.0)
 
     def __str__(self):
